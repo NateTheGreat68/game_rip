@@ -6,7 +6,7 @@ export DEST_PATH=/output
 usage() {
 	echo "usage: (docker run ...) console image_name"
 	echo "       (docker run ...) -h"
-	echo "supported consoles: psx"
+	echo "supported consoles: psx,ps2"
 	[ $# -eq 1 ] && exit $1
 }
 
@@ -33,6 +33,10 @@ case "$CONSOLE" in
 	psx|ps1)
 		set_dest_path 'ps[x1]?|playstation( ?[x1])?'
 		time ./rip_psx.sh
+		;;
+	ps2)
+		set_dest_path 'ps2|playstation( ?2)?'
+		time ./rip_ps2.sh
 		;;
 	*)
 		echo "Unrecognized console: $CONSOLE"
