@@ -15,7 +15,7 @@ set_dest_path() {
 		-maxdepth 1 \
 		-type d \
 		-regextype awk \
-		-iregex "$DEST_PATH/$1" \
+		-iregex "$DEST_PATH/($1)$" \
 		-print -quit)
 	DEST_PATH="${POTENTIAL_PATH:-$DEST_PATH}"
 }
@@ -31,7 +31,7 @@ fi
 
 case "$CONSOLE" in
 	psx|ps1)
-		set_dest_path '(ps[x1]?|playstation( ?[x1])?)$'
+		set_dest_path 'ps[x1]?|playstation( ?[x1])?'
 		time ./rip_psx.sh
 		;;
 	*)
