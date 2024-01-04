@@ -4,9 +4,6 @@ RUN dnf -y install \
 	mame-tools \
 	eject
 
-ENV USERID=0
-ENV GROUPID=0
-
 VOLUME ["/output", "/tmp/ramdisk"]
 
 ADD app app

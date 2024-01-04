@@ -1,30 +1,34 @@
 #!/bin/bash
 #
 
-USERID=$(id -u)
-GROUPID=$(id -g)
-DEVICE="/dev/sr0"
-OUTPUT_PATH="/mnt/games"
-CONTAINER_NAME="${@: -1}"
+DEVICE="${DEVICE:-/dev/sr0}"
+OUTPUT_PATH="${OUTPUT_PATH:-$HOME/Games}"
 
 usage() {
-	echo "usage: $0 [-d output_subdir] console image_name"
+	echo "usage: $0 console image_name"
+	echo "       $0 -h"
+	[ $# -eq 1 ] && exit $1
 }
 
-if [ "$1" = "-h" ]; then
-	usage
-	exit 0
+if [ $# -eq 2 ]; then
+	CONSOLE="$1"
+	IMAGE_NAME="$2"
+elif [ "$1" = "-h" ]; then
+	usage 0
+else
+	usage 1
 fi
 
 docker build -t game_rip ./image/
 
 docker run -d \
-	-e "USERID=$USERID" \
-	-e "GROUPID=$GROUPID" \
 	--device="$DEVICE:/dev/cdrom" \
-	--tmpfs "/tmp/ramdisk" \
+	--tmpfs /tmp/ramdisk \
 	-v "$OUTPUT_PATH:/output" \
-	--name "$CONTAINER_NAME" \
-	game_rip $@
+	--name "$IMAGE_NAME" \
+	-l game_rip \
+	game_rip "$CONSOLE" "$IMAGE_NAME"
 
-echo "$CONTAINER_NAME detached."
+echo "$IMAGE_NAME detached."
+
+docker logs -f "$IMAGE_NAME"
