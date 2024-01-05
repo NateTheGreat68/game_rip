@@ -36,6 +36,11 @@ for RIP_DEF in "$@"; do
 	CONSOLE=$(get_console "$RIP_DEF")
 	ROM_NAME=$(get_rom_name "$RIP_DEF")
 
+	# Remove the container with that name if it already exists.
+	if docker container inspect "game_rip.$ROM_NAME" > /dev/null 2>&1; then
+		docker container rm -f "game_rip.$ROM_NAME"
+	fi
+
 	docker run \
 		--device="$DEVICE:/dev/cdrom" \
 		--tmpfs /tmp/ramdisk \
