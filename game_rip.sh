@@ -38,7 +38,7 @@ for RIP_DEF in "$@"; do
 
 	# Remove the container with that name if it already exists.
 	if docker container inspect "game_rip.$ROM_NAME" > /dev/null 2>&1; then
-		docker container rm -f "game_rip.$ROM_NAME"
+		docker container rm -f "game_rip.$ROM_NAME" > /dev/null
 	fi
 
 	# Wait for the disk to be loaded, if necessary.
