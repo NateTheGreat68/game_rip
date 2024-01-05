@@ -28,5 +28,9 @@ chdman createcd \
 # Set permissions on the .chd file.
 chown --reference="$DEST_PATH" "$DEST_PATH/$ROM_NAME.chd"
 
+# Show the completed file.
+cd "$DEST_PATH"
+ls -sh "$ROM_NAME.chd"
+
 # Eject the disk drive.
 eject /dev/cdrom

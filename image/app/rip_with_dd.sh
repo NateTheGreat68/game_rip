@@ -8,6 +8,7 @@ set -e
 cd /tmp/ramdisk
 
 # Rip the disk contents into a .iso file.
+echo "Ripping with dd; you may not see any output for a while."
 dd if=/dev/cdrom of=rom.iso
 
 # Compress the .iso file into a .chd file, stored and name as determined by
@@ -18,6 +19,10 @@ chdman createcd \
 
 # Set permissions on the .chd file.
 chown --reference="$DEST_PATH" "$DEST_PATH/$ROM_NAME.chd"
+
+# Show the completed file.
+cd "$DEST_PATH"
+ls -sh "$ROM_NAME.chd"
 
 # Eject the disk drive.
 eject /dev/cdrom
