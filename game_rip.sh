@@ -5,7 +5,7 @@ DEVICE=${DEVICE:-/dev/sr0}
 OUTPUT_PATH=${OUTPUT_PATH:-$HOME/Games}
 
 usage() {
-	echo "usage: $0 console:image_name"
+	echo "usage: $0 console:rom_name"
 	echo "       $0 -h"
 	[ $# -eq 1 ] && exit $1
 }
@@ -14,7 +14,7 @@ get_console() {
 	echo "$1" | cut -sd: -f1
 }
 
-get_image_name() {
+get_rom_name() {
 	echo "$1" | cut -sd: -f2
 }
 
@@ -23,7 +23,7 @@ if [ $# -ge 1 ]; then
 		usage 0
 	elif [[ "$1" =~ : ]]; then
 		CONSOLE=$(get_console "$1")
-		IMAGE_NAME=$(get_image_name "$1")
+		ROM_NAME=$(get_rom_name "$1")
 	else
 		usage 1
 	fi
@@ -37,10 +37,10 @@ docker run -d \
 	--device="$DEVICE:/dev/cdrom" \
 	--tmpfs /tmp/ramdisk \
 	-v "$OUTPUT_PATH:/output" \
-	--name "$IMAGE_NAME" \
+	--name "$ROM_NAME" \
 	-l game_rip \
-	game_rip "$CONSOLE" "$IMAGE_NAME"
+	game_rip "$CONSOLE" "$ROM_NAME"
 
-echo "$IMAGE_NAME detached."
+echo "$ROM_NAME detached."
 
-docker logs -f "$IMAGE_NAME"
+docker logs -f "$ROM_NAME"

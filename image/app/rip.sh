@@ -4,7 +4,7 @@
 export DEST_PATH=/output
 
 usage() {
-	echo "usage: (docker run ...) console image_name"
+	echo "usage: (docker run ...) console rom_name"
 	echo "       (docker run ...) -h"
 	echo "supported consoles: psx,ps2"
 	[ $# -eq 1 ] && exit $1
@@ -22,7 +22,7 @@ set_dest_path() {
 
 if [ $# -eq 2 ]; then
 	CONSOLE=$1
-	export IMAGE_NAME=$2
+	export ROM_NAME=$2
 elif [ "$1" = "-h" ]; then
 	usage 0
 else
