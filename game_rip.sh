@@ -41,6 +41,15 @@ for RIP_DEF in "$@"; do
 		docker container rm -f "game_rip.$ROM_NAME"
 	fi
 
+	# Wait for the disk to be loaded, if necessary.
+	if ! head --bytes=1 "$DEVICE" > /dev/null 2>&1; then
+		echo "Waiting for disk drive to be ready..."
+		while ! head --bytes=1 "$DEVICE" > /dev/null 2>&1; do
+			sleep 5s
+		done
+		echo "Disk drive ready, beginning rip."
+	fi
+
 	docker run \
 		--device="$DEVICE:/dev/cdrom" \
 		--tmpfs /tmp/ramdisk \
