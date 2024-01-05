@@ -2,7 +2,7 @@
 #
 
 DEVICE=${DEVICE:-/dev/sr0}
-OUTPUT_PATH=${OUTPUT_PATH:-$HOME/Games}
+ROM_BASE_PATH=${ROM_BASE_PATH:-$HOME/Games}
 
 usage() {
 	echo "usage: $0 console:rom_name [console:rom_name ...]"
@@ -53,7 +53,7 @@ for RIP_DEF in "$@"; do
 	docker run \
 		--device="$DEVICE:/dev/cdrom" \
 		--tmpfs /tmp/ramdisk \
-		-v "$OUTPUT_PATH:/output" \
+		-v "$ROM_BASE_PATH:/output" \
 		--name "game_rip.$ROM_NAME" \
 		-l game_rip \
 		game_rip "$CONSOLE" "$ROM_NAME"
