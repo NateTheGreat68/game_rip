@@ -1,23 +1,29 @@
 #!/bin/bash
 #
 
+# Edit these to match your system's setup.
 DEVICE=${DEVICE:-/dev/sr0}
 ROM_BASE_PATH=${ROM_BASE_PATH:-$HOME/Games}
 
+# Print the usage statement.
 usage() {
 	echo "usage: $0 console:rom_name [console:rom_name ...]"
 	echo "       $0 -h"
+	# If an argument is provided, exit with its value.
 	[ $# -eq 1 ] && exit $1
 }
 
+# Get the console portion of a "console:rom_name" string.
 get_console() {
 	echo "$1" | cut -sd: -f1
 }
 
+# Get the rom_name portion of a "console:rom_name" string.
 get_rom_name() {
 	echo "$1" | cut -sd: -f2
 }
 
+# Basic argument checks.
 if [ $# -ge 1 ]; then
 	if [ "$1" = "-h" ]; then
 		usage 0
@@ -26,10 +32,13 @@ else
 	usage 1
 fi
 
+# Build the docker image each time; useful during development.
+# This will automatically incorporate any changes made to the image.
 docker build -t game_rip ./image/
 
 for RIP_DEF in "$@"; do
-	if [[ ! "$RIP_DEF" =~ : ]]; then
+	# Verify that the argument is of the form "console:rom_name".
+	if [[ ! "$RIP_DEF" =~ .+:.+ ]]; then
 		usage 1
 	fi
 
@@ -50,6 +59,7 @@ for RIP_DEF in "$@"; do
 		echo "Disk drive ready, beginning rip."
 	fi
 
+	# Run the docker container that does the actual ripping.
 	docker run \
 		--device="$DEVICE:/dev/cdrom" \
 		--tmpfs /tmp/ramdisk \
