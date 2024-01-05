@@ -17,12 +17,12 @@ set_dest_path() {
 		-regextype awk \
 		-iregex "$DEST_PATH/($1)$" \
 		-print -quit)
-	DEST_PATH="${POTENTIAL_PATH:-$DEST_PATH}"
+	DEST_PATH=${POTENTIAL_PATH:-$DEST_PATH}
 }
 
 if [ $# -eq 2 ]; then
-	CONSOLE="$1"
-	export IMAGE_NAME="$2"
+	CONSOLE=$1
+	export IMAGE_NAME=$2
 elif [ "$1" = "-h" ]; then
 	usage 0
 else

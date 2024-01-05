@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 
-DEVICE="${DEVICE:-/dev/sr0}"
-OUTPUT_PATH="${OUTPUT_PATH:-$HOME/Games}"
+DEVICE=${DEVICE:-/dev/sr0}
+OUTPUT_PATH=${OUTPUT_PATH:-$HOME/Games}
 
 usage() {
 	echo "usage: $0 console:image_name"
@@ -18,11 +18,15 @@ get_image_name() {
 	echo "$1" | cut -sd: -f2
 }
 
-if [[ "$1" =~ : ]]; then
-	CONSOLE=$(get_console "$1")
-	IMAGE_NAME=$(get_image_name "$1")
-elif [ "$1" = "-h" ]; then
-	usage 0
+if [ $# -ge 1 ]; then
+	if [ "$1" = "-h" ]; then
+		usage 0
+	elif [[ "$1" =~ : ]]; then
+		CONSOLE=$(get_console "$1")
+		IMAGE_NAME=$(get_image_name "$1")
+	else
+		usage 1
+	fi
 else
 	usage 1
 fi
