@@ -36,6 +36,7 @@ fi
 # This will automatically incorporate any changes made to the image.
 docker build -t game_rip ./image/
 
+# Loop through each RIP_DEF ("console:rom_name" argument).
 for RIP_DEF in "$@"; do
 	# Verify that the argument is of the form "console:rom_name".
 	if [[ ! "$RIP_DEF" =~ .+:.+ ]]; then
