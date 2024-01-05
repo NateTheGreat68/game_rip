@@ -43,6 +43,7 @@ for RIP_DEF in "$@"; do
 		usage 1
 	fi
 
+	echo "Next rip: $RIP_DEF"
 	CONSOLE=$(get_console "$RIP_DEF")
 	ROM_NAME=$(get_rom_name "$RIP_DEF")
 
