@@ -5,14 +5,22 @@ DEVICE="${DEVICE:-/dev/sr0}"
 OUTPUT_PATH="${OUTPUT_PATH:-$HOME/Games}"
 
 usage() {
-	echo "usage: $0 console image_name"
+	echo "usage: $0 console:image_name"
 	echo "       $0 -h"
 	[ $# -eq 1 ] && exit $1
 }
 
-if [ $# -eq 2 ]; then
-	CONSOLE="$1"
-	IMAGE_NAME="$2"
+get_console() {
+	echo "$1" | cut -sd: -f1
+}
+
+get_image_name() {
+	echo "$1" | cut -sd: -f2
+}
+
+if [[ "$1" =~ : ]]; then
+	CONSOLE=$(get_console "$1")
+	IMAGE_NAME=$(get_image_name "$1")
 elif [ "$1" = "-h" ]; then
 	usage 0
 else
