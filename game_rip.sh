@@ -2,8 +2,8 @@
 #
 
 # Edit these to match your system's setup.
-DEVICE=${DEVICE:-/dev/sr0}
-ROM_BASE_PATH=${ROM_BASE_PATH:-$HOME/Games}
+GAME_RIP_DRIVE=${GAME_RIP_DRIVE:-/dev/sr0}
+GAME_RIP_ROM_BASE_PATH=${GAME_RIP_ROM_BASE_PATH:-$HOME/Games}
 
 # Print the usage statement.
 usage() {
@@ -53,9 +53,9 @@ for RIP_DEF in "$@"; do
 	fi
 
 	# Wait for the disk to be loaded, if necessary.
-	if ! head --bytes=1 "$DEVICE" > /dev/null 2>&1; then
+	if ! head --bytes=1 "$GAME_RIP_DRIVE" > /dev/null 2>&1; then
 		echo "Waiting for disk drive to be ready..."
-		while ! head --bytes=1 "$DEVICE" > /dev/null 2>&1; do
+		while ! head --bytes=1 "$GAME_RIP_DRIVE" > /dev/null 2>&1; do
 			sleep 5s
 		done
 		echo "Disk drive ready, beginning rip."
@@ -63,9 +63,9 @@ for RIP_DEF in "$@"; do
 
 	# Run the docker container that does the actual ripping.
 	docker run \
-		--device="$DEVICE:/dev/cdrom" \
+		--device="$GAME_RIP_DRIVE:/dev/cdrom" \
 		--tmpfs /tmp/ramdisk \
-		-v "$ROM_BASE_PATH:/output" \
+		-v "$GAME_RIP_ROM_BASE_PATH:/output" \
 		--name "game_rip.$ROM_NAME" \
 		-l game_rip \
 		game_rip "$CONSOLE" "$ROM_NAME"
