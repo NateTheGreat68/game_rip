@@ -3,13 +3,17 @@
 
 export DEST_PATH=/output
 
+# Print the usage statement.
 usage() {
 	echo "usage: (docker run ...) console rom_name"
 	echo "       (docker run ...) -h"
 	echo "supported consoles: psx,ps2"
+	# If an argument is provided, exit with its value.
 	[ $# -eq 1 ] && exit $1
 }
 
+# Append a subdirectory to the DEST_PATH, if one exists which matches
+# a regex provided as an argument.
 set_dest_path() {
 	POTENTIAL_PATH=$(find "$DEST_PATH/" \
 		-maxdepth 1 \
@@ -20,6 +24,7 @@ set_dest_path() {
 	DEST_PATH=${POTENTIAL_PATH:-$DEST_PATH}
 }
 
+# Basic argument check.
 if [ $# -eq 2 ]; then
 	CONSOLE=$1
 	export ROM_NAME=$2
@@ -29,6 +34,7 @@ else
 	usage 1
 fi
 
+# Find the correct console script to use and run it.
 case "$CONSOLE" in
 	psx|ps1)
 		set_dest_path 'ps[x1]?|playstation( ?[x1])?'
