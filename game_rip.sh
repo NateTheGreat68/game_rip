@@ -40,7 +40,7 @@ for RIP_DEF in "$@"; do
 		--device="$DEVICE:/dev/cdrom" \
 		--tmpfs /tmp/ramdisk \
 		-v "$OUTPUT_PATH:/output" \
-		--name "$ROM_NAME" \
+		--name "game_rip.$ROM_NAME" \
 		-l game_rip \
 		game_rip "$CONSOLE" "$ROM_NAME"
 done
