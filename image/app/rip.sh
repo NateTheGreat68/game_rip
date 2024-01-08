@@ -24,6 +24,15 @@ set_dest_path() {
 	DEST_PATH=${POTENTIAL_PATH:-$DEST_PATH}
 }
 
+# If the output file already exists, rename it.
+# The first and only argument should be the file suffix (no ".").
+rename_existing() {
+	if [ -f "$DEST_PATH/$ROM_NAME.$1" ]; then
+		echo "$ROM_NAME.$1 exists; renaming it to $ROM_NAME.$1.old"
+		mv "$DEST_PATH/$ROM_NAME.$1" "$DEST_PATH/$ROM_NAME.$1.old"
+	fi
+}
+
 # Basic argument check.
 if [ $# -eq 2 ]; then
 	CONSOLE=$1
@@ -38,10 +47,12 @@ fi
 case "$CONSOLE" in
 	psx|ps1)
 		set_dest_path 'ps[x1]?|playstation( ?[x1])?'
+		rename_existing 'chd'
 		time ./rip_psx.sh
 		;;
 	ps2)
 		set_dest_path 'ps2|playstation( ?2)?'
+		rename_existing 'chd'
 		time ./rip_ps2.sh
 		;;
 	*)

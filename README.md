@@ -23,6 +23,8 @@ If the base output path (GAME\_RIP\_ROM\_BASE\_PATH) has a matching subdirectory
 
 The ownership of the output ROM file will be matched to that of the directory it's in.
 
+If a ROM file already exists with the same name, it will be renamed to end with a ".old" suffix.
+
 ## Configuration and Defaults
 **The script assumes your CD drive is /dev/sr0 and that the desired directory for finished ROM files is ~/Games/.** There are 3 ways to override one or both of these:
 1. Edit the first few lines of game\_rip.sh. Note that these changes will be reverted if you perform a git pull to update your local copy of the script.
