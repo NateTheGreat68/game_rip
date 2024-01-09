@@ -46,19 +46,21 @@ else
 fi
 
 # Find the correct console script to use and run it.
-case "$CONSOLE" in
-	psx|ps1)
-		set_dest_path 'ps[x1]?|playstation( ?[x1])?'
-		rename_existing 'chd'
-		time ./rip_psx.sh
-		;;
-	ps2)
-		set_dest_path 'ps2|playstation( ?2)?'
-		rename_existing 'chd'
-		time ./rip_ps2.sh
-		;;
-	*)
-		echo "Unrecognized console: $CONSOLE"
-		exit 1
-		;;
-esac
+time {
+	case "$CONSOLE" in
+		psx|ps1)
+			set_dest_path 'ps[x1]?|playstation( ?[x1])?'
+			rename_existing 'chd'
+			./rip_psx.sh
+			;;
+		ps2)
+			set_dest_path 'ps2|playstation( ?2)?'
+			rename_existing 'chd'
+			./rip_ps2.sh
+			;;
+		*)
+			echo "Unrecognized console: $CONSOLE"
+			exit 1
+			;;
+	esac
+}
