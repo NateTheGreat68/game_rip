@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+set -e
+
 export DEST_PATH=/output
 
 # Print the usage statement.

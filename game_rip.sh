@@ -69,4 +69,12 @@ for RIP_DEF in "$@"; do
 		--name "game_rip.$ROM_NAME" \
 		-l game_rip \
 		game_rip "$CONSOLE" "$ROM_NAME"
+
+	# Stop processing the queue if a rip fails.
+	# Don't eject the disk; that's taken as a signal of successful completion.
+	EXIT_CODE=$?
+	if [ $EXIT_CODE -ne 0 ]; then
+		echo "Rip failed with status $EXIT_CODE; terminating the rip queue."
+		exit $EXIT_CODE
+	fi
 done
