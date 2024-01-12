@@ -2,8 +2,9 @@
 #
 
 # Edit these to match your system's setup.
-GAME_RIP_DRIVE=${GAME_RIP_DRIVE:-/dev/sr0}
-GAME_RIP_ROM_BASE_PATH=${GAME_RIP_ROM_BASE_PATH:-$HOME/Games}
+: ${GAME_RIP_DRIVE:=/dev/sr0}
+: ${GAME_RIP_ROM_BASE_PATH:=$HOME/Games}
+: ${GAME_RIP_LOG_BASE_PATH=$GAME_RIP_ROM_BASE_PATH}
 
 # Print the usage statement.
 usage() {
@@ -62,13 +63,25 @@ for RIP_DEF in "$@"; do
 	fi
 
 	# Run the docker container that does the actual ripping.
-	docker run \
-		--device="$GAME_RIP_DRIVE:/dev/cdrom" \
-		--tmpfs /tmp/ramdisk \
-		-v "$GAME_RIP_ROM_BASE_PATH:/output" \
-		--name "game_rip.$ROM_NAME" \
-		-l game_rip \
-		game_rip "$CONSOLE" "$ROM_NAME"
+	if [ -n "$GAME_RIP_LOG_BASE_PATH" ]; then
+		docker run \
+			--device="$GAME_RIP_DRIVE:/dev/cdrom" \
+			--tmpfs /tmp/ramdisk \
+			-v "$GAME_RIP_ROM_BASE_PATH:/output" \
+			-v "$GAME_RIP_LOG_BASE_PATH:/output_logs" \
+			--name "game_rip.$ROM_NAME" \
+			-l game_rip \
+			game_rip "$CONSOLE" "$ROM_NAME"
+	else
+		docker run \
+			--device="$GAME_RIP_DRIVE:/dev/cdrom" \
+			--tmpfs /tmp/ramdisk \
+			-v "$GAME_RIP_ROM_BASE_PATH:/output" \
+			--tmpfs /output_logs \
+			--name "game_rip.$ROM_NAME" \
+			-l game_rip \
+			game_rip "$CONSOLE" "$ROM_NAME"
+	fi
 
 	# Stop processing the queue if a rip fails.
 	# Don't eject the disk; that's taken as a signal of successful completion.

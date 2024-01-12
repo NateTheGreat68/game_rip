@@ -4,7 +4,7 @@ RUN dnf -y install \
 	mame-tools \
 	eject
 
-VOLUME ["/output", "/tmp/ramdisk"]
+VOLUME ["/output", "/tmp/ramdisk", "/output_logs"]
 
 ADD app app
 WORKDIR /app

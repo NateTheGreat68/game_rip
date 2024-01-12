@@ -30,3 +30,6 @@ If a ROM file already exists with the same name, it will be renamed to end with 
 1. Edit the first few lines of game\_rip.sh. Note that these changes will be reverted if you perform a git pull to update your local copy of the script.
 1. Run the script like `GAME_RIP_DRIVE=/dev/cd GAME_RIP_ROM_BASE_PATH=/mnt/games ./game_rip.sh ...`. Note that you'll have to specify these each time you run the script.
 1. Export the GAME\_RIP\_DRIVE and GAME\_RIP\_ROM\_BASE\_PATH environment variables: `$ export GAME_RIP_DRIVE=/dev/cd` and/or `$ export GAME_RIP_ROM_BASE_PATH=/mnt/games`. Note that you'll have to export the variables each time you open a new terminal if you don't add them to your ~/.bashrc file or similar.
+
+## Logging
+Logs are saved, by default, as hidden files in the same directory as the output ROM file. This can be configured with the environment variable GAME\_RIP\_LOG\_BASE\_PATH; setting it to an empty string will prevent logs from being saved.
