@@ -4,6 +4,7 @@
 set -e
 
 DEST_PATH=/output
+LOG_PATH=/output_logs
 
 # Print the usage statement.
 usage() {
@@ -14,16 +15,17 @@ usage() {
 	[ $# -eq 1 ] && exit $1
 }
 
-# Append a subdirectory to the DEST_PATH, if one exists which matches
-# a regex provided as an argument.
-set_dest_path() {
-	POTENTIAL_PATH=$(find "$DEST_PATH/" \
+# Append a subdirectory to the first argument,
+# if one exists which matches regex provided as the second argument.
+# Otherwise, echo an empty string.
+set_path() {
+	POTENTIAL_PATH=$(find "$1/" \
 		-maxdepth 1 \
 		-type d \
 		-regextype awk \
-		-iregex "$DEST_PATH/($1)$" \
+		-iregex "$1/($2)$" \
 		-print -quit)
-	DEST_PATH=${POTENTIAL_PATH:-$DEST_PATH}
+	echo "${POTENTIAL_PATH:-$1}"
 }
 
 # Move the output file to the destination path.
@@ -44,23 +46,30 @@ else
 fi
 
 # Find the correct console script to use and run it.
+case "$CONSOLE" in
+	psx|ps1)
+		DEST_PATH=$(set_path "$DEST_PATH" 'ps[x1]?|playstation( ?[x1])?')
+		LOG_PATH=$(set_path "$LOG_PATH" 'ps[x1]?|playstation( ?[x1])?')
+		SCRIPT_PATH=./rip_psx.sh
+		;;
+	ps2)
+		DEST_PATH=$(set_path "$DEST_PATH" 'ps2|playstation( ?2)?')
+		LOG_PATH=$(set_path "$LOG_PATH" 'ps2|playstation( ?2)?')
+		SCRIPT_PATH=./rip_ps2.sh
+		;;
+	*)
+		echo "Unrecognized console: $CONSOLE"
+		exit 1
+		;;
+esac
 time {
-	case "$CONSOLE" in
-		psx|ps1)
-			set_dest_path 'ps[x1]?|playstation( ?[x1])?'
-			source ./rip_psx.sh
-			;;
-		ps2)
-			set_dest_path 'ps2|playstation( ?2)?'
-			source ./rip_ps2.sh
-			;;
-		*)
-			echo "Unrecognized console: $CONSOLE"
-			exit 1
-			;;
-	esac
+	date && \
+	source "$SCRIPT_PATH" && \
 	move_rom_to_dest
-}
+} |& tee -a "$LOG_PATH/.$ROM_NAME.log"
+# Throw the exit code before tee for the sake of `set -e`.
+# Otherwise, a failure in the block above wouldn't exit the script.
+( exit ${PIPESTATUS[0]}; )
 
 # Eject the disk.
 eject /dev/cdrom
