@@ -28,6 +28,12 @@ set_path() {
 	echo "${POTENTIAL_PATH:-$1}"
 }
 
+# Set both DEST_PATH and LOG_PATH, using the regex provided as the argument.
+set_paths() {
+	DEST_PATH=$(set_path "$DEST_PATH" "$1")
+	LOG_PATH=$(set_path "$LOG_PATH" "$1")
+}
+
 # Move the output file to the destination path.
 move_rom_to_dest() {
 	chown -R --reference="$DEST_PATH" ./*
@@ -48,13 +54,11 @@ fi
 # Find the correct console script to use and run it.
 case "$CONSOLE" in
 	psx|ps1)
-		DEST_PATH=$(set_path "$DEST_PATH" 'ps[x1]?|playstation( ?[x1])?')
-		LOG_PATH=$(set_path "$LOG_PATH" 'ps[x1]?|playstation( ?[x1])?')
+		set_paths 'ps[x1]?|playstation( ?[x1])?'
 		SCRIPT_PATH=./rip_psx.sh
 		;;
 	ps2)
-		DEST_PATH=$(set_path "$DEST_PATH" 'ps2|playstation( ?2)?')
-		LOG_PATH=$(set_path "$LOG_PATH" 'ps2|playstation( ?2)?')
+		set_paths 'ps2|playstation ?2'
 		SCRIPT_PATH=./rip_ps2.sh
 		;;
 	*)
