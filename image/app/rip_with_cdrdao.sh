@@ -6,6 +6,8 @@ set -e
 
 # Work in the ramdisk folder.
 cd /tmp/ramdisk
+mkdir -p working output
+cd working
 
 # Rip the disk contents into a .toc and .bin file.
 cdrdao read-cd --read-raw \
@@ -23,14 +25,7 @@ toc2cue -sC rom.bin \
 # as determined by the environment variables.
 chdman createcd \
 	-i rom.cue \
-	-o "$DEST_PATH/$ROM_NAME.chd"
+	-o "../output/$ROM_NAME.chd"
 
-# Set permissions on the .chd file.
-chown --reference="$DEST_PATH" "$DEST_PATH/$ROM_NAME.chd"
-
-# Show the completed file.
-cd "$DEST_PATH"
-ls -sh "$ROM_NAME.chd"
-
-# Eject the disk drive.
-eject /dev/cdrom
+# Change to the output directory for the parent script.
+cd ../output

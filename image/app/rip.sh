@@ -3,7 +3,7 @@
 
 set -e
 
-export DEST_PATH=/output
+DEST_PATH=/output
 
 # Print the usage statement.
 usage() {
@@ -26,19 +26,17 @@ set_dest_path() {
 	DEST_PATH=${POTENTIAL_PATH:-$DEST_PATH}
 }
 
-# If the output file already exists, rename it.
-# The first and only argument should be the file suffix (no ".").
-rename_existing() {
-	if [ -f "$DEST_PATH/$ROM_NAME.$1" ]; then
-		echo "$ROM_NAME.$1 exists; renaming it to $ROM_NAME.$1.old"
-		mv "$DEST_PATH/$ROM_NAME.$1" "$DEST_PATH/$ROM_NAME.$1.old"
-	fi
+# Move the output file to the destination path.
+move_rom_to_dest() {
+	chown -R --reference="$DEST_PATH" ./*
+	ls -shR | grep -ve '^total' -e '^.:$'
+	mv --backup=numbered ./* "$DEST_PATH/"
 }
 
 # Basic argument check.
 if [ $# -eq 2 ]; then
 	CONSOLE=$1
-	export ROM_NAME=$2
+	ROM_NAME=$2
 elif [ "$1" = "-h" ]; then
 	usage 0
 else
@@ -50,17 +48,19 @@ time {
 	case "$CONSOLE" in
 		psx|ps1)
 			set_dest_path 'ps[x1]?|playstation( ?[x1])?'
-			rename_existing 'chd'
-			./rip_psx.sh
+			source ./rip_psx.sh
 			;;
 		ps2)
 			set_dest_path 'ps2|playstation( ?2)?'
-			rename_existing 'chd'
-			./rip_ps2.sh
+			source ./rip_ps2.sh
 			;;
 		*)
 			echo "Unrecognized console: $CONSOLE"
 			exit 1
 			;;
 	esac
+	move_rom_to_dest
 }
+
+# Eject the disk.
+eject /dev/cdrom
