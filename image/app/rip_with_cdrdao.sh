@@ -5,9 +5,7 @@
 set -e
 
 # Work in the ramdisk folder.
-cd /tmp/ramdisk
-mkdir -p working output
-cd working
+cd "$WORKING_PATH"
 
 # Rip the disk contents into a .toc and .bin file.
 cdrdao read-cd --read-raw \
@@ -25,7 +23,4 @@ toc2cue -sC rom.bin \
 # as determined by the environment variables.
 chdman createcd \
 	-i rom.cue \
-	-o "../output/$ROM_NAME.chd"
-
-# Change to the output directory for the parent script.
-cd ../output
+	-o "$STAGE_PATH/$ROM_NAME.chd"
