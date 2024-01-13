@@ -65,6 +65,7 @@ for RIP_DEF in "$@"; do
 	# Run the docker container that does the actual ripping.
 	if [ -n "$GAME_RIP_LOG_BASE_PATH" ]; then
 		docker run \
+			--rm \
 			--device="$GAME_RIP_DRIVE:/dev/cdrom" \
 			--tmpfs /tmp/ramdisk \
 			-v "$GAME_RIP_ROM_BASE_PATH:/output" \
@@ -74,6 +75,7 @@ for RIP_DEF in "$@"; do
 			game_rip "$CONSOLE" "$ROM_NAME"
 	else
 		docker run \
+			--rm \
 			--device="$GAME_RIP_DRIVE:/dev/cdrom" \
 			--tmpfs /tmp/ramdisk \
 			-v "$GAME_RIP_ROM_BASE_PATH:/output" \
