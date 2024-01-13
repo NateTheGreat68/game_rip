@@ -5,9 +5,7 @@
 set -e
 
 # Work in the ramdisk folder.
-cd /tmp/ramdisk
-mkdir -p working output
-cd working
+cd "$WORKING_PATH"
 
 # Rip the disk contents into a .iso file.
 echo "Ripping with dd; you may not see any output for a while."
@@ -17,7 +15,4 @@ dd if=/dev/cdrom of=rom.iso
 # the environment variables.
 chdman createcd \
 	-i rom.iso \
-	-o "../output/$ROM_NAME.chd"
-
-# Change to the output directory for the parent script.
-cd ../output
+	-o "$STAGE_PATH/$ROM_NAME.chd"

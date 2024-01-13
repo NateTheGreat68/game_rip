@@ -5,6 +5,8 @@ set -e
 
 DEST_PATH=/output
 LOG_PATH=/output_logs
+STAGE_PATH=/tmp/output
+mkdir -p "$STAGE_PATH"
 
 # Print the usage statement.
 usage() {
@@ -29,13 +31,30 @@ set_path() {
 }
 
 # Set both DEST_PATH and LOG_PATH, using the regex provided as the argument.
+# Set WORKING_PATH based on available capacity.
 set_paths() {
 	DEST_PATH=$(set_path "$DEST_PATH" "$1")
 	LOG_PATH=$(set_path "$LOG_PATH" "$1")
+
+	# Check if /tmp/ramdisk is mounted (the path will exist regardless).
+	if df /tmp/ramdisk > /dev/null 2>&1; then
+		disk_size=$(lsblk -bo SIZE /dev/cdrom | tail -n1)
+		ramdisk_free=$(df -B1 --output=avail /tmp/ramdisk | tail -n1)
+		# Check if ramdisk capacity is at least 125% of the disk size
+		if [ $(($disk_size*5/4)) -le $ramdisk_free ]; then
+			WORKING_PATH=/tmp/ramdisk/working
+		else
+			WORKING_PATH=/tmp/working
+		fi
+	else
+		WORKING_PATH=/tmp/working
+	fi
+	mkdir -p "$WORKING_PATH"
 }
 
-# Move the output file to the destination path.
+# Move the output file(s) to the destination path.
 move_rom_to_dest() {
+	cd "$STAGE_PATH"
 	chown -R --reference="$DEST_PATH" ./*
 	ls -shR | grep -ve '^total' -e '^.:$'
 	mv --backup=numbered ./* "$DEST_PATH/"
