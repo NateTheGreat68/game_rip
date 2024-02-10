@@ -5,6 +5,7 @@
 : ${GAME_RIP_DRIVE:=/dev/sr0}
 : ${GAME_RIP_ROM_BASE_PATH:=$HOME/Games}
 : ${GAME_RIP_LOG_BASE_PATH=$GAME_RIP_ROM_BASE_PATH}
+: ${OCI_COMMAND:=""}
 
 # Print the usage statement.
 usage() {
@@ -33,9 +34,40 @@ else
 	usage 1
 fi
 
-# Build the docker image each time; useful during development.
+# Set OCI_COMMAND and any specific arguments.
+if [ -z ${OCI_COMMAND+x} ]; then
+	if which docker &> /dev/null; then
+		OCI_COMMAND=docker
+	elif which podman &> /dev/null; then
+		OCI_COMMAND=podman
+	else
+		echo "ERROR: No known container runtime found." 1>&2
+		echo "       Docker and podman are currently supported." 1>&2
+		exit 1
+	fi
+fi
+mount_arguments=""
+additional_arguments=""
+case "$OCI_COMMAND" in
+	docker)
+		;;
+	podman)
+		if getsebool container_use_devices | grep off &> /dev/null; then
+			echo "ERROR: SELinux container_use_devices is not on. Please run:" 1>&2
+			echo "       $ sudo setsebool -P container_use_devices 1"
+			echo "       and try again."
+			exit 1
+		fi
+		mount_arguments=":Z"
+		additional_arguments="--security-opt=unmask=ALL"
+		;;
+	*)
+		;;
+esac
+
+# Build the image each time; useful during development.
 # This will automatically incorporate any changes made to the image.
-docker build -t game_rip ./image/
+$OCI_COMMAND build -t game_rip ./image/
 
 # Loop through each RIP_DEF ("console:rom_name" argument).
 for RIP_DEF in "$@"; do
@@ -49,8 +81,8 @@ for RIP_DEF in "$@"; do
 	ROM_NAME=$(get_rom_name "$RIP_DEF")
 
 	# Remove the container with that name if it already exists.
-	if docker container inspect "game_rip.$ROM_NAME" > /dev/null 2>&1; then
-		docker container rm -f "game_rip.$ROM_NAME" > /dev/null
+	if $OCI_COMMAND container inspect "game_rip.$ROM_NAME" > /dev/null 2>&1; then
+		$OCI_COMMAND container rm -f "game_rip.$ROM_NAME" > /dev/null
 	fi
 
 	# Wait for the disk to be loaded, if necessary.
@@ -62,26 +94,28 @@ for RIP_DEF in "$@"; do
 		echo "Disk drive ready, beginning rip."
 	fi
 
-	# Run the docker container that does the actual ripping.
+	# Run the container that does the actual ripping.
 	if [ -n "$GAME_RIP_LOG_BASE_PATH" ]; then
-		docker run \
+		$OCI_COMMAND run \
 			--rm \
 			--device="$GAME_RIP_DRIVE:/dev/cdrom" \
 			--tmpfs /tmp/ramdisk \
-			-v "$GAME_RIP_ROM_BASE_PATH:/output" \
-			-v "$GAME_RIP_LOG_BASE_PATH:/output_logs" \
+			-v "$GAME_RIP_ROM_BASE_PATH:/output$mount_arguments" \
+			-v "$GAME_RIP_LOG_BASE_PATH:/output_logs$mount_arguments" \
 			--name "game_rip.$ROM_NAME" \
 			-l game_rip \
+			$additional_arguments \
 			game_rip "$CONSOLE" "$ROM_NAME"
 	else
-		docker run \
+		$OCI_COMMAND run \
 			--rm \
 			--device="$GAME_RIP_DRIVE:/dev/cdrom" \
 			--tmpfs /tmp/ramdisk \
-			-v "$GAME_RIP_ROM_BASE_PATH:/output" \
+			-v "$GAME_RIP_ROM_BASE_PATH:/output$mount_arguments" \
 			--tmpfs /output_logs \
 			--name "game_rip.$ROM_NAME" \
 			-l game_rip \
+			$additional_arguments \
 			game_rip "$CONSOLE" "$ROM_NAME"
 	fi
 

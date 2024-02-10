@@ -33,3 +33,9 @@ If a ROM file already exists with the same name, it will be renamed to end with 
 
 ## Logging
 Logs are saved, by default, as hidden files in the same directory as the output ROM file. This can be configured with the environment variable GAME\_RIP\_LOG\_BASE\_PATH; setting it to an empty string will prevent logs from being saved.
+
+## Podman
+Podman can be used to rip individual games.
+1. Set the environment variable `OCI_COMMAND=podman` (or, if you have podman but not docker, do nothing; it'll automatically choose podman).
+1. Run `# setsebool -P container_use_devices=true`.
+1. Follow the normal instructions above to run the script. Note that it can currently only rip one game at a time since the eject command doesn't work in a podman container. An eject error will appear at the end of each rip; it can be safely ignored.
