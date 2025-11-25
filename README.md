@@ -3,7 +3,7 @@ Backup image creation scripts for various game consoles
 
 This script rips console game disks for use as backups or in emulators. Verifying the legality in your jurisdiction is your responsibility.
 
-For simplified compatibility across distroes, the script uses a Docker container to perform the ripping. Docker and a CD (or DVD or Blu-Ray) drive are really the only prerequisites.
+For simplified compatibility across distros, the script uses a Docker container to perform the ripping. Docker and a CD (or DVD or Blu-Ray) drive are really the only prerequisites.
 
 ## Installation and Usage
 Basic usage consists of cloning into this repo, moving into its folder, and running the script to automatically build the Docker image and begin ripping disks.
